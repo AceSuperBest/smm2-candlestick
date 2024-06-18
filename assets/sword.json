@@ -1,0 +1,12 @@
+{
+    "name": "大师剑",
+    "mode": "grid",
+    "scale": 5,
+    "static": [],
+    "region": [
+        [0, 0, 13, 24]
+    ],
+    "duplication": [
+        [0, 24, 13, 1]
+    ]
+}

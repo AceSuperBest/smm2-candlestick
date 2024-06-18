@@ -1,0 +1,12 @@
+{
+    "name": "红管子",
+    "mode": "grid",
+    "scale": 5,
+    "static": [],
+    "region": [
+        [0, 0, 25, 12]
+    ],
+    "duplication": [
+        [0, 12, 25, 2]
+    ]
+}
