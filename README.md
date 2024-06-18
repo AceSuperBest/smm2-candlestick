@@ -75,13 +75,13 @@ kline.png:
 
 ### 高度 / height
 
-满足公式：$height = \left(\max_{img \in assets}{img.scale} \times \left(\max_{score} - \min_{score}\right)\right)$
+满足公式: `height = (max(assets.scale) * (max(data.score) -  min(data.score)))`
 
 简单说，设 assets 里面的配置的所有`scale`的最大值记作`scale`，那么每`scale`个像素对应一分
 
-即如果给定的所有数据中，最高分是$7800$，最低分$7700$。那么图片的`height`就应该有$100scale$
+即如果给定的所有数据中，最高分是 $7800$，最低分 $7700$。那么图片的`height`就应该有 $100scale$
 
-这个配置可以通过修改 assets 的 json 中的`scale`字段来修改，但是为了对齐分数，我强制使用了最大值，也就是公式里的$\max_{img \in assets}{img.scale}$
+这个配置可以通过修改 assets 的 json 中的`scale`字段来修改，但是为了对齐分数，我强制使用了最大值，也就是公式里的`max(assets.scale)`
 
 ### 宽度 / width
 
@@ -95,4 +95,4 @@ kline.png:
 
 图片的最高位($y=0$)，被视为所有给定数据的最高分，本质所有的K线柱都是通过最高分算的
 
-所以有利用需求可以通过**最高分位置**并且以**scale像素分数比**去做如匹配坐标系等的应用
+所以有利用需求可以通过**最高分位置**并且以**scale像分比**去做如匹配坐标系等的应用
