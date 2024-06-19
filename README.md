@@ -36,6 +36,8 @@ pip install -r requirements.txt
 
 Currently, the timestamp is not used; it only needs to be logically sequential. The program will automatically sort the timestamp field in the CSV data in ascending order.
 
+kline.csv:
+
 ```csv
 timestamp,open,high,low,close
 1718640000,7500,7622,7488,7583
@@ -60,7 +62,7 @@ python app.py
 ### Result
 kline.png:
 
-![kline](kline.png)
+![kline](template/kline.png)
 
 
 ## Image Properties
@@ -119,4 +121,4 @@ kline.png:
 }
 ```
 
-表示对于长度在 $24$ 以内的，按长度选用`region`的图像，而长度大于 $24$ 的，则等量地堆叠`duplication`
+表示对于长度在 $24$ 以内的，按长度选用`region`的图像，而长度大于 $24$ 的，则超过部分等量地堆叠`duplication`

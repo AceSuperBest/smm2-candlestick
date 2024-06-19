@@ -4,14 +4,14 @@ import csv
 
 
 today = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
-week = [today - datetime.timedelta(days=i) for i in range(7)]
+days = [today - datetime.timedelta(days=i) for i in range(26)]
 
 header = ["timestamp", "open", "high", "low", "close"]
 datas: list[list[int]] = []
 
 now = 7500
 
-for day in week:
+for day in days:
     t = int(day.timestamp())
     delta = random.randint(-100, 100)
     o = now
@@ -22,7 +22,7 @@ for day in week:
     now = c
 
 # save to csv
-with open("kline.csv", "w", encoding="utf-8", newline="") as f:
+with open("kline-ico.csv", "w", encoding="utf-8", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(datas)
