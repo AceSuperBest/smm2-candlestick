@@ -3,6 +3,7 @@ from .enumeratement import *
 from typing import Any
 from PIL import Image
 from pydantic import BaseModel
+from typing_extensions import deprecated
 
 
 class Structure(BaseModel):
@@ -25,7 +26,7 @@ class Structure(BaseModel):
         配置region居中的x坐标在(upper-left)
         """
         return (width or self.maximun - self.region) // 2
-    
+
     def centralize_duplication(self, width: int | None = None) -> int:
         """
         配置duplication居中的x坐标在(upper-left)
@@ -33,12 +34,45 @@ class Structure(BaseModel):
         return (width or self.maximun - self.duplication) // 2
 
 
+def process_coord_str(image: Image.Image, isx: bool, coord_str: int | str) -> int:
+    if isinstance(coord_str, int):
+        if coord_str < 0:
+            return image.width if isx else image.height + coord_str
+        return coord_str
+    if coord_str.isdigit():
+        return int(coord_str)
+    if coord_str.endswith("%"):
+        return int(coord_str[:-1]) * (image.width if isx else image.height) // 100
+    if coord_str.endswith("px"):
+        return int(coord_str[:-2])
+    match coord_str:
+        case "center":
+            return image.width // 2 if isx else image.height // 2
+        case "min":
+            return 0
+        case "max":
+            return image.width if isx else image.height
+        case _:
+            raise ValueError(f"Invalid coord_str {coord_str}")
+
+
+def process_coord(image: Image.Image, x: int | str, y: int | str, w: int | str, h: int | str):
+    return (
+        process_coord_str(image, True, x),
+        process_coord_str(image, False, y),
+        process_coord_str(image, True, w),
+        process_coord_str(image, False, h)
+    )
+
+
 class CommonGraphics(PropertiesGraphics):
     __GRAPHICS_PROPERTIES__ = { "static", "region", "duplication" }
 
     @staticmethod
-    def transfer(image: Image.Image, x: int, y: int, w: int, h: int):
-        return image.crop((x, y, x + w, y + h))
+    def transfer(image: Image.Image, x: int | str, y: int | str, w: int | str, h: int | str):
+        coord = process_coord(image, x, y, w, h)
+        box = (coord[0], coord[1], coord[0] + coord[2], coord[1] + coord[3])
+        return image.crop(box)
 
     def __init__(self, image: Image.Image, properties: dict[str, Any]):
         super().__init__(image, properties)
@@ -55,6 +89,7 @@ class CommonGraphics(PropertiesGraphics):
         assert len(self._statics) <= 1 and len(self._regions) <= 1 and len(self._duplications) == 1, "Not Implemented for multiple statics, regions or duplications"
 
     @property
+    @deprecated("不再支持配置文件的scale")
     def scale(self) -> int:
         return self._scale
 
@@ -143,8 +178,8 @@ class CommonGraphics(PropertiesGraphics):
         """
         将图像在image上绘制在(x, y)位置
         """
-        this_image = self.gen_image(length, scale=self._scale, direction=direction)
         width_maximun = max(image.width, this_image.width)
+        this_image = self.gen_image(length, scale=self._scale, direction=direction)
         height_maximun = image.height + this_image.height
         new_image = Image.new("RGBA", (width_maximun, height_maximun))
         new_image.paste(image, ((width_maximun - image.width) // 2, 0))
