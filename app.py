@@ -36,7 +36,7 @@ try:
         filepath = get_file()
         if not filepath:
             message_box("请先创建kline.csv文件")
-            exit(1)
+            sys.exit(1)
         group = CandleGroup(csv_file=filepath)
     else: group = CandleGroup(csv_file='kline.csv')
     image = group.image
@@ -46,4 +46,4 @@ except Exception as e:
     import traceback
     traceback.print_exc()
     message_box(f"生成kline.png失败: {e}")
-    exit(-1)
+    sys.exit(-1)
