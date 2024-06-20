@@ -1,6 +1,6 @@
 # SMM2 - Candlestick Chart Generator
 
-![Build Status](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml/badge.svg)
+[![Build and Release](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml/badge.svg)](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml)
 
 ## Introduction
 创建一个可以基于分数生成K线图表的脚本
