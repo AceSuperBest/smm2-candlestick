@@ -1,6 +1,6 @@
 # SMM2 - Candlestick Chart Generator
 
-[![Build and Release](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml/badge.svg)](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml)
+[![Build and Release](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml/badge.svg?branch=master&event=status)](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml)
 
 English: [README_EN](README_EN.md) (Incomplete)
 
