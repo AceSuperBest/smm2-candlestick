@@ -4,6 +4,8 @@
 
 English: [README_EN](README_EN.md) (Incomplete)
 
+以下是主分支的wiki，只有更新大板时才会更新，变动频繁的wiki导引被我放在了[Wiki](https://github.com/AceSuperBest/smm2-candlestick/wiki/Wiki%E2%80%90Home)了，优先以Wiki为准。
+
 ## 导引
 创建一个可以基于分数生成K线图表的脚本
 
