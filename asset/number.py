@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 from .items import ItemGraphicsFactory
+from .utils import get_assets_path
 from pydantic import BaseModel
 import os
 
@@ -32,7 +33,7 @@ class NumberGraphicsResources:
 
     @classmethod
     def static_init(cls, factory: ItemGraphicsFactory):
-        fontpath: str = factory.properties['coordinate']['font']
+        fontpath: str = get_assets_path(factory.properties['coordinate']['font'])
         if not os.path.exists(fontpath):
             raise FileNotFoundError("Font file not found")
         cls.font = ImageFont.truetype(fontpath, 24)

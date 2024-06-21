@@ -1,8 +1,10 @@
 ﻿name: Update Badge Status
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["Build and Release"]
+    types:
+      - completed
 
 jobs:
   update-status:
