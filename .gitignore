@@ -162,3 +162,5 @@ cython_debug/
 *.zip
 .idea/
 *.exe
+
+test*.png

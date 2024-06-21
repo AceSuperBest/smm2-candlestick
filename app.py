@@ -1,28 +1,41 @@
-from asset import *
+import asset
+from PIL import Image
+import locale
 import sys
 import os
 
 WINDOWS = os.name == 'nt'
 
-def get_executable_directory():
-    if getattr(sys, 'frozen', False):
-        # 如果程序是被PyInstaller打包后的可执行文件
-        application_path = os.path.dirname(sys.executable)
-    else:
-        # 如果是直接运行的脚本
-        application_path = os.path.dirname(os.path.abspath(__file__))
-    return application_path
+current_locale, encoding = locale.getdefaultlocale()
 
-factory = ItemGraphicsFactory(os.path.join(get_executable_directory(), 'assets'))
-CandleGraphicsResources.static_init(factory)
+if current_locale is None:
+    current_locale = 'en'
+else:
+    current_locale = current_locale.split('_')[0]
 
-CANDLE_NAME = 'kline'
+factory = asset.asset_init()
+i18n = asset.utils.get_i18n(current_locale, 'notice')
+
+CANDLE_NAME = str(factory.properties['candlestick']['name'])
+
+CANDLE_FILENAMES = {
+    'csv': f'{CANDLE_NAME}.csv',
+    'candlestick': f'{CANDLE_NAME}.png',
+    'number': f'{CANDLE_NAME}-number.png',
+    'merged': f'{CANDLE_NAME}-merged.png'
+}
+
+CANDLE_FILEPATHS = {
+    name: asset.utils.get_executable_directory(filename)
+    for name, filename in CANDLE_FILENAMES.items()
+}
+
 
 if WINDOWS:
     from utils.winhelper import create_selector, message_box
 
     def get_file():
-        return create_selector("选择K线数据文件", [("CSV文件", "*.csv")])
+        return create_selector(i18n['file-selector-title'], [(i18n['file-selector-filter'], "*.csv")])
 else:
     def message_box(message):
         print(message)
@@ -32,18 +45,24 @@ else:
 
 
 try:
-    if not os.path.exists('kline.csv'):
+    if not os.path.exists(CANDLE_FILEPATHS['csv']):
         filepath = get_file()
         if not filepath:
-            message_box("请先创建kline.csv文件")
+            message_box(i18n['please-precreate'].format(csv=CANDLE_FILENAMES['csv']))
             sys.exit(1)
-        group = CandleGroup(csv_file=filepath)
-    else: group = CandleGroup(csv_file='kline.csv')
+        group = asset.CandleGroup(csv_file=filepath)
+    else: group = asset.CandleGroup(csv_file=CANDLE_FILEPATHS['csv'])
     image = group.image
-    image.save("kline.png")
-    message_box("生成kline.png成功")
+    number = group.number_image
+    image.save(CANDLE_FILEPATHS['candlestick'])
+    number.crop(number.getbbox()).save(CANDLE_FILEPATHS['number'])
+    big_image = Image.new('RGBA', (number.width, number.height))
+    big_image.paste(image, (0, asset.NumberGraphicsResources.max_height * 2))
+    merged = Image.alpha_composite(big_image, number)
+    merged.crop(merged.getbbox()).save(CANDLE_FILEPATHS['merged'])
+    message_box(i18n['success'].format(**CANDLE_FILENAMES))
 except Exception as e:
     import traceback
     traceback.print_exc()
-    message_box(f"生成kline.png失败: {e}")
+    message_box(i18n['error'].format(error=e, **CANDLE_FILENAMES), title=i18n['error-title'])
     sys.exit(-1)

@@ -1,3 +1,9 @@
 {
-    "spacing": 25
+    "spacing": 15,
+    "font": "fonts/AlibabaPuHuiTi-3-115-Black/AlibabaPuHuiTi-3-115-Black.ttf",
+    "font-size": 24,
+    "font-scale": 2,
+    "font-border-size": 1,
+    "font-margin": [0, 20],
+    "font-max-height": 90
 }

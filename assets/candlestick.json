@@ -1,4 +1,8 @@
 {
     "green_up": false,
-    "scale": 5
+    "scale": 7,
+    "name": "kline",
+    "arrow": "sword",
+    "green": "green-pipe",
+    "red": "red-pipe"
 }

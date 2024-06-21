@@ -2,42 +2,47 @@
 
 [![Build and Release](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml/badge.svg)](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml)
 
-## Introduction
+English: [README_EN](README_EN.md) (Incomplete)
+
+## 导引
 创建一个可以基于分数生成K线图表的脚本
-
-Create a python script that generates candlestick charts from multiplayer scores in SMM2 (Super Mario Maker 2).
-
-*目前无完整的英文翻译，因为感觉不会有什么人用*
 
 **灵感来源于Bai水友社区**
 
-**Inspired by the Bai fan community.**
+*目前无完整的英文翻译，因为感觉不会有什么人看*
 
 本项目并不算完善的，还需要做很多事情，而且机制很可能后面会改不少，所以，有需求在issue提吧
 
-This project isn't perfect yet—there's still a lot to do, and the mechanics are likely to change quite a bit. So, if you have any requests or suggestions, please drop them in the issues.
+**当前已经具备自动打包的Release、生成K线、生成K线数字、组合图、Windows提示，以及加了i18n的提示多语种支持（原生的错误全部为英文）**
 
-## Quick Start
-Minimum Requirement: Install [Python](https://www.python.org/downloads/)
-### Installation
+## 如何启动？
+### 安装
+#### 直接 Python 启动
+
+最起码安装一个 3.10 的 Python: [Python](https://www.python.org/downloads/)
+
+本项目开发在 3.12.1 版本，由于 3.12 之后支持更高级的 f-string 格式，如果我不经意间使用了就得换了，所以建议使用更新的版本。
+
+由于项目是必然有 3.10 才支持的 Union 类型注解的`|`格式，因此如果不用 3.10 以上无法运行
+
 *如果需要虚拟环境的话需要提前创建并激活*
-
-*If a virtual environment is required, it needs to be created and activated in advance.*
 
 ```shell
 pip install pillow pydantic
 ```
 
-or
+或
 
 ```shell
 pip install -r requirements.txt
 ```
 
-### Populate kline.csv
-目前timestamp并没有被使用，只需要保证逻辑上是顺序即可，程序会自动对csv数据的timestamp字段做升序排序
+#### 使用 Release 打包版
 
-Currently, the timestamp is not used; it only needs to be logically sequential. The program will automatically sort the timestamp field in the CSV data in ascending order.
+下载 SMM2-Candlestick.zip -> 解压到合适目录
+
+### 给出 kline.csv 数据
+目前timestamp并没有被使用，只需要保证逻辑上是顺序即可，程序会自动对csv数据的timestamp字段做升序排序
 
 kline.csv:
 
@@ -53,19 +58,33 @@ timestamp,open,high,low,close
 ...
 ```
 
-### Generate
+这个文件可以在 candlestick.json 配置中自定义 name 字段确定
+
+### 生成
 在本目录所在路径执行(确保assets文件夹数据存在, kline.csv存在)
 
-Run in the current directory path (ensure the 'assets' folder and 'kline.csv' are present).
+当前版本在Windows下执行会检测是否有kline.csv，如果没有的话会启用一个文件选择器
 
 ```shell
 python app.py
 ```
 
-### Result
+或
+
+直接执行app.exe，需要保证assets文件夹在该exe所在目录
+
+### 结果
+会在脚本所在目录或app.exe所在目录生成一个kline.png、kline-number.png、kline-merged.png
+
+而这个 kline 也是对应 candlestick.json 的 name
+
 kline.png:
 
 ![kline](template/kline.png)
+
+kline-merged.png
+
+![merged](template/kline-merged.png)
 
 
 ## Image Properties
@@ -84,7 +103,9 @@ kline.png:
 当前的`spacing`也会根据`scale`来放大，后面视情况独立。
 
 ### 顶部 / top
-图片的最高位($y=0$)，被视为所有给定数据的最高分，本质所有的K线柱都是通过最高分算的
+图片的最高位($y=0$)，被视为所有给定数据的最高分，本质所有的K线柱都是通过最高分来确定位置的。
+
+带数字的图片的($y=0$)无法用于对齐，需要找到最高处的剑或者水管亦或者横盘线的像素，因此推荐使用分离的图片自行外部合并。
 
 所以有利用需求可以通过**最高分位置**并且以**scale像分比例**去做如匹配坐标系等的应用
 

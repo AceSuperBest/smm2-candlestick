@@ -1,0 +1,8 @@
+{
+    "file-selector-title": "选择K线数据文件",
+    "file-selector-filter": "CSV文件",
+    "please-precreate": "请先创建{csv}文件",
+    "success": "生成{candlestick}, {number}, {merged}成功",
+    "error": "生成{candlestick}, {number}, {merged}失败:\n{error}",
+    "error-title": "错误"
+}

@@ -1,4 +1,5 @@
 from .items import ItemGraphicsFactory
+from .number import NumberGraphicsResources
 from PIL import Image, ImageDraw
 from graphics import Direction, CommonGraphics
 from pydantic import BaseModel
@@ -18,23 +19,73 @@ class CandleStructure(BaseModel):
 
     @property
     def up_height(self) -> int:
-        if self.body == 0 and self.up:
-            return self.up * self.scale - 1
         return self.up * self.scale
 
     @property
     def body_height(self) -> int:
-        return self.body * self.scale or 1
+        return (abs(self.body) + 1) * self.scale
 
     @property
     def down_height(self) -> int:
-        if self.body == 0 and self.down and not self.up:
-            return self.down * self.scale - 1
         return self.down * self.scale
+
+    @property
+    def height(self) -> int:
+        return self.up_height + self.body_height + self.down_height
+
+    @property
+    def empty_canvas(self) -> Image.Image:
+        return Image.new("RGBA", (self.width, self.height))
+
+    def extend_canvas(self, width: int, height: int) -> Image.Image:
+        return Image.new("RGBA", (self.width + width, self.height + height))
+
+    def generate_image(
+        self,
+        tops: list[Image.Image],
+        body_up: Image.Image | None,
+        body_down: Image.Image | None,
+        bottoms: list[Image.Image]
+    ) -> tuple[Image.Image, int]:
+        """
+        基于给定的图像区域拼接K线画板
+        
+        :return: 拼接后的图像, 与K线主要部分的高度
+        """
+        up_height = sum(map(lambda x: x.height, tops))
+        body_height = 0
+        if body_up:
+            body_height += body_up.height
+        if body_down:
+            body_height += body_down.height
+        down_height = sum(map(lambda x: x.height, bottoms))
+        height = up_height + self.height + down_height
+        image = Image.new("RGBA", (self.width, height))
+        y = 0
+        for img in tops:
+            image.paste(img, ((self.width - img.width) // 2, y))
+            y += img.height
+        y += self.up_height
+        if self.body_height > body_height:
+            if body_up:
+                image.paste(body_up, ((self.width - body_up.width) // 2, y))
+            if body_down:
+                y = y + self.body_height - body_down.height
+                image.paste(body_down, ((self.width - body_down.width) // 2, y))
+                y += body_down.height
+            else:
+                y += self.body_height
+        else:
+            y += self.body_height
+        y += self.down_height
+        for img in bottoms:
+            image.paste(img, ((self.width - img.width) // 2, y))
+            y += img.height
+        return image, up_height
 
 
 class CandleGraphicsResources:
-    sword: CommonGraphics
+    arrow: CommonGraphics
     green: CommonGraphics
     red: CommonGraphics
     green_solid: Image.Image
@@ -54,15 +105,15 @@ class CandleGraphicsResources:
 
     @classmethod
     def static_init(cls, factory: ItemGraphicsFactory):
-        cls.sword = factory["sword"]
-        cls.green = factory["green-pipe"]
-        cls.red = factory["red-pipe"]
-        assert cls.sword and cls.green and cls.red, "Invalid graphics"
+        cls.arrow = factory[factory.properties['candlestick']['arrow']]
+        cls.green = factory[factory.properties['candlestick']['green']]
+        cls.red = factory[factory.properties['candlestick']['red']]
+        assert cls.arrow and cls.green and cls.red, "Invalid graphics"
         cls.spacing = int(factory.properties['coordinate']['spacing'])
         cls.green_up = bool(factory.properties['candlestick']['green_up'])
-        # cls.scale = max(cls.green.scale, cls.red.scale, cls.sword.scale)
+        # cls.scale = max(cls.green.scale, cls.red.scale, cls.arrow.scale)
         cls.scale = int(factory.properties['candlestick']['scale']) # 让像分比例统一，并统一配置
-        cls.width = max(cls.green.width.maximun, cls.red.width.maximun, cls.sword.width.maximun)
+        cls.width = max(cls.green.width.maximun, cls.red.width.maximun, cls.arrow.width.maximun)
         cls.green_solid = cls.create_solid('green', cls.width, cls.scale)
         cls.red_solid = cls.create_solid('red', cls.width, cls.scale)
         cls.black_solid = cls.create_solid('black', cls.width, cls.scale)
@@ -71,7 +122,7 @@ class CandleGraphicsResources:
     def gen_arrow(cls, length: int, up: bool = True) -> Image.Image | None:
         if length <= 0:
             return None
-        return cls.sword.gen_image(
+        return cls.arrow.gen_image(
             length,
             scale=cls.scale,
             direction=(Direction.up if up else Direction.down)
@@ -156,6 +207,25 @@ class Candle(BaseModel):
     def down_length(self) -> int:
         return min(self.open, self.close) - self.low
 
+    @property
+    def should_up(self) -> int:
+        return self.body_length or self.down_length - self.up_length
+
+    @property
+    def should_up_check(self) -> bool:
+        return self.should_up > 0
+
+    def _draw_number(self, green: bool = False, with_box: tuple[int | None, int | None] | None = None) -> Image.Image | tuple[Image.Image, Image.Image, Image.Image, Image.Image]:
+        if self.should_up == 0:
+            return NumberGraphicsResources.create_number(self.close, 'black', with_margin=True, with_box=with_box)
+        color = (self.should_up > 0) ^ green and 'green' or 'red'
+        return (
+            NumberGraphicsResources.create_number(-self.open, color, with_margin=True, with_box=with_box),
+            NumberGraphicsResources.create_number(self.high, color, with_margin=True, with_box=with_box),
+            NumberGraphicsResources.create_number(self.low, color, with_margin=True, with_box=with_box),
+            NumberGraphicsResources.create_number(-self.close, color, with_margin=True, with_box=with_box)
+        )
+
     def draw_candle(self, green: bool = False):
         """
         基于当前的K线数据绘制K线柱
@@ -163,6 +233,25 @@ class Candle(BaseModel):
         :param green: 是否为绿涨红跌(国际标准)
         """
         return CandleGraphicsResources.gen_candle(self.up_length, self.body_length, self.down_length, green)
+
+    def draw_number(self, structure: CandleStructure, green: bool = False):
+        """
+        绘制K线柱的数值
+
+        :param structure: 绘制参数
+        :param green: 是否为绿涨红跌(国际标准)
+        """
+        images = self._draw_number(green, with_box=(None, None))
+        if isinstance(images, Image.Image):
+            canvas = structure.empty_canvas
+            return CandleGraphicsResources.vertical_combine_images(canvas, images), 0
+        o, h, l, c = images
+        body_need = o.height + c.height
+        body_top = self.should_up_check and c or o
+        body_down = self.should_up_check and o or c
+        if structure.body_height < body_need:
+            return structure.generate_image([h, body_top], None, None, [body_down, l])
+        return structure.generate_image([h], body_top, body_down, [l])
 
 
 class CandleGroup:
@@ -315,3 +404,24 @@ class CandleGroup:
                 self._image.paste(image, (x_now, y_now))
         return self._image
 
+    @property
+    def number_images(self):
+        """
+        数值图像列表 (每个K线的数值图像)
+        """
+        if getattr(self, "_number_images", None) is None:
+            self._number_images: list[tuple[Image.Image, int]] = []
+            for candle, structure in zip(self._candles, self.structures):
+                self._number_images.append(candle.draw_number(structure, CandleGraphicsResources.green_up))
+        return self._number_images
+
+    @property
+    def number_image(self) -> Image.Image:
+        """
+        数值结果图像
+        """
+        if getattr(self, "_number_image", None) is None:
+            self._number_image = Image.new("RGBA", (self.width, self.height + 4 * NumberGraphicsResources.max_height))
+            for x_now, y_now, (image, y_offset) in zip(self.x_indexes, self.y_indexes, self.number_images):
+                self._number_image.paste(image, (x_now, y_now + 2 * NumberGraphicsResources.max_height - y_offset))
+        return self._number_image
