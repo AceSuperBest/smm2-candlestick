@@ -1,8 +1,10 @@
 import asset
-from PIL import Image
+import warnings
 import locale
 import sys
 import os
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 WINDOWS = os.name == 'nt'
 
@@ -45,21 +47,19 @@ else:
 
 
 try:
-    if not os.path.exists(CANDLE_FILEPATHS['csv']):
+    argv1 = (sys.argv[1] if len(sys.argv) > 1 else '').lower().strip()
+    csv_file = argv1 if argv1 and argv1.endswith('.csv') else CANDLE_FILEPATHS['csv']
+    if not os.path.exists(csv_file):
         filepath = get_file()
         if not filepath:
             message_box(i18n['please-precreate'].format(csv=CANDLE_FILENAMES['csv']))
             sys.exit(1)
         group = asset.CandleGroup(csv_file=filepath)
-    else: group = asset.CandleGroup(csv_file=CANDLE_FILEPATHS['csv'])
-    image = group.image
-    number = group.number_image
-    image.save(CANDLE_FILEPATHS['candlestick'])
-    number.crop(number.getbbox()).save(CANDLE_FILEPATHS['number'])
-    big_image = Image.new('RGBA', (number.width, number.height))
-    big_image.paste(image, (0, asset.NumberGraphicsResources.max_height * 2))
-    merged = Image.alpha_composite(big_image, number)
-    merged.crop(merged.getbbox()).save(CANDLE_FILEPATHS['merged'])
+    else: group = asset.CandleGroup(csv_file=csv_file)
+    candlestick, number, merged = group.merged_tuple
+    candlestick.save(CANDLE_FILEPATHS['candlestick'])
+    number.save(CANDLE_FILEPATHS['number'])
+    merged.save(CANDLE_FILEPATHS['merged'])
     message_box(i18n['success'].format(**CANDLE_FILENAMES))
 except Exception as e:
     import traceback

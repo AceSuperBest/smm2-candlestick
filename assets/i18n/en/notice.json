@@ -2,7 +2,7 @@
     "file-selector-title": "Select Candlestic Data File",
     "file-selector-filter": "CSV File",
     "please-precreate": "Please create the {csv} file first",
-    "success": "Generate {candlestick}, {number}, {merged} success!",
-    "error": "Generate {candlestick}, {number}, {merged} error:\n{error}",
+    "success": "Generate\n{candlestick}\n{number}\n{merged}\nsuccess!",
+    "error": "Generate\n{candlestick}\n{number}\n{merged}\nerror:\n{error}",
     "error-title": "Error"
 }

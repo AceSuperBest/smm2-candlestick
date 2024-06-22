@@ -36,8 +36,8 @@ class NumberGraphicsResources:
         fontpath: str = get_assets_path(factory.properties['coordinate']['font'])
         if not os.path.exists(fontpath):
             raise FileNotFoundError("Font file not found")
-        cls.font = ImageFont.truetype(fontpath, 24)
         cls.size = factory.properties['coordinate']['font-size']
+        cls.font = ImageFont.truetype(fontpath, cls.size)
         cls.border = factory.properties['coordinate']['font-border-size']
         cls.scale = factory.properties['coordinate']['font-scale']
         cls.max_height = factory.properties['coordinate']['font-max-height']

@@ -405,6 +405,16 @@ class CandleGroup:
         return self._image
 
     @property
+    def big_image(self) -> Image.Image:
+        """
+        大图像
+        """
+        if getattr(self, "_big_image", None) is None:
+            self._big_image = Image.new("RGBA", (self.width, self.height + 4 * NumberGraphicsResources.max_height))
+            self._big_image.paste(self.image, (0, 2 * NumberGraphicsResources.max_height))
+        return self._big_image
+
+    @property
     def number_images(self):
         """
         数值图像列表 (每个K线的数值图像)
@@ -425,3 +435,19 @@ class CandleGroup:
             for x_now, y_now, (image, y_offset) in zip(self.x_indexes, self.y_indexes, self.number_images):
                 self._number_image.paste(image, (x_now, y_now + 2 * NumberGraphicsResources.max_height - y_offset))
         return self._number_image
+
+    @property
+    def merged_image(self) -> Image.Image:
+        """
+        合并结果图像
+        """
+        if getattr(self, "_merged_image", None) is None:
+            self._merged_image = Image.alpha_composite(self.big_image, self.number_image)
+        return self._merged_image
+
+    @property
+    def merged_tuple(self) -> tuple[Image.Image, ...]:
+        """
+        合并结果图像元组
+        """
+        return self.image, self.number_image.crop(self.number_image.getbbox()), self.merged_image.crop(self.merged_image.getbbox())
