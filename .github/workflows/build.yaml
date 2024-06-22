@@ -51,6 +51,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./smm2-candlestick.zip
-          asset_name: smm2-candlestick.zip
+          asset_path: ./SMM2-Candlestick-${{ github.ref }}.zip
+          asset_name: SMM2-Candlestick-${{ github.ref }}.zip
           asset_content_type: application/zip
