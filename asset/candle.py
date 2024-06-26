@@ -317,7 +317,9 @@ class CandleGroup:
                 _ = next(reader) # skip header
                 self._candles = []
                 for row in reader:
-                    t, o, h, l, c = map(int, row)
+                    try:
+                        t, o, h, l, c = map(int, row)
+                    except: continue
                     self._candles.append(Candle(timestamp=t, open=o, high=h, low=l, close=c))
                 self._candles.sort(key=lambda x: x.timestamp)
         else:
