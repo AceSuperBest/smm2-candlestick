@@ -1,4 +1,5 @@
 {
+    "invalid-candles": "Invalid candles (with timestamp):",
     "NORMAL": "Normal",
     "SCORE_NEGATIVE": "The score is negative",
     "HIGH_LESS_THAN_MAX": "High score < opening or closing score",

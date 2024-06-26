@@ -332,7 +332,7 @@ class CandleGroup:
     def check_error(self):
         errors = [candle for candle in self._candles if candle.check != CandleErrorStatus.NORMAL]
         if errors:
-            raise ValueError(f"Invalid candles (with timestamps):\n{'\n'.join(error.error_message for error in errors)}")
+            raise ValueError(f"{i18n['invalid-candles']}\n{'\n'.join(error.error_message for error in errors)}")
 
     @property
     def spacing(self) -> int:
