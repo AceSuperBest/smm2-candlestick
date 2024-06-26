@@ -1,13 +1,17 @@
 from .items import ItemGraphicsFactory
 from .number import NumberGraphicsResources
+from .utils import get_i18n
 from PIL import Image, ImageDraw
 from graphics import Direction, CommonGraphics
 from pydantic import BaseModel
 from typing import overload
+from enum import Enum
 import csv
 
 
 __all__ = ["Candle", "CandleGraphicsResources", "CandleStructure", "CandleGroup"]
+
+i18n = get_i18n('candle')
 
 
 class CandleStructure(BaseModel):
@@ -140,7 +144,7 @@ class CandleGraphicsResources:
         if length == 0:
             if should_up == 0:
                 return cls.black_solid
-            return (should_up < 0) ^ green_up and cls.green_solid or cls.red_solid
+            return (should_up > 0) ^ green_up and cls.green_solid or cls.red_solid
         length += length // abs(length) # 补偿缺的一分
         return ((length > 0) ^ green_up and cls.green or cls.red).gen_image(
             abs(length),
@@ -153,7 +157,7 @@ class CandleGraphicsResources:
         """
         生成单个K线的图像，以及绘制参数
         """
-        should_up = up_length - down_length
+        should_up = down_length - up_length
         up_image = cls.gen_arrow(up_length, up=True)
         down_image = cls.gen_arrow(down_length, up=False)
         # 不再需要占用别的部分的长度，整数对齐天然给了一倍空间
@@ -188,6 +192,13 @@ class CandleGraphicsResources:
         return image
 
 
+class CandleErrorStatus(Enum):
+    NORMAL = 0
+    SCORE_NEGATIVE = 1
+    HIGH_LESS_THAN_MAX = 2
+    LOW_GREATER_THAN_MIN = 3
+
+
 class Candle(BaseModel):
     timestamp: int
     open: int
@@ -215,10 +226,24 @@ class Candle(BaseModel):
     def should_up_check(self) -> bool:
         return self.should_up > 0
 
+    @property
+    def check(self):
+        if self.open < 0 or self.high < 0 or self.low < 0 or self.close < 0:
+            return CandleErrorStatus.SCORE_NEGATIVE
+        if self.high < max(self.open, self.close):
+            return CandleErrorStatus.HIGH_LESS_THAN_MAX
+        if self.low > min(self.open, self.close):
+            return CandleErrorStatus.LOW_GREATER_THAN_MIN
+        return CandleErrorStatus.NORMAL
+
+    @property
+    def error_message(self):
+        return f'{self.timestamp}: {i18n.get(self.check.name, 'UNKNOWN')}'
+
     def _draw_number(self, green: bool = False, with_box: tuple[int | None, int | None] | None = None) -> Image.Image | tuple[Image.Image, Image.Image, Image.Image, Image.Image]:
-        if self.should_up == 0:
+        if self.body_length == 0 and self.should_up == 0 and self.up_length == 0 and self.down_length == 0:
             return NumberGraphicsResources.create_number(self.close, 'black', with_margin=True, with_box=with_box)
-        color = (self.should_up > 0) ^ green and 'green' or 'red'
+        color = (self.should_up > 0) ^ green and 'green' or (self.should_up == 0) and 'black' or 'red'
         return (
             NumberGraphicsResources.create_number(-self.open, color, with_margin=True, with_box=with_box),
             NumberGraphicsResources.create_number(self.high, color, with_margin=True, with_box=with_box),
@@ -303,6 +328,11 @@ class CandleGroup:
 
     def __getitem__(self, index: int) -> Candle:
         return self._candles[index].model_copy()
+
+    def check_error(self):
+        errors = [candle for candle in self._candles if candle.check != CandleErrorStatus.NORMAL]
+        if errors:
+            raise ValueError(f"Invalid candles (with timestamps):\n{'\n'.join(error.error_message for error in errors)}")
 
     @property
     def spacing(self) -> int:

@@ -1,6 +1,18 @@
+import warnings
+import locale
 import json
 import sys
 import os
+
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+current_locale, encoding = locale.getdefaultlocale()
+
+if current_locale is None:
+    current_locale = 'en'
+else:
+    current_locale = current_locale.split('_')[0]
 
 
 def get_executable_directory(path: str | None = None):
@@ -16,13 +28,15 @@ def get_executable_directory(path: str | None = None):
     return application_path
 
 
-def get_i18n(iso639: str, file: str) -> dict[str, str]:
+def get_i18n(file: str, iso639: str | None = None) -> dict[str, str]:
     """
     获取国际化文件 (如果不存在则使用英文文件)
     
-    :param iso639: 语言代码
     :param file: 文件名
+    :param iso639: 语言代码 (默认为当前系统语言)
     """
+    if iso639 is None:
+        iso639 = current_locale
     i18n_path = get_executable_directory('assets/i18n')
     lang_dirpath = os.path.join(i18n_path, iso639)
     lang_json_file = file.lower().removesuffix('.json') + '.json'

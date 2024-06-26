@@ -1,0 +1,7 @@
+{
+    "NORMAL": "正常",
+    "SCORE_NEGATIVE": "分数有负数",
+    "HIGH_LESS_THAN_MAX": "最高分低于开收",
+    "LOW_GREATER_THAN_MIN": "最低分高于开收",
+    "UNKNOWN": "未知错误"
+}

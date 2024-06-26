@@ -1,22 +1,12 @@
 import asset
-import warnings
-import locale
 import sys
 import os
 
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 WINDOWS = os.name == 'nt'
 
-current_locale, encoding = locale.getdefaultlocale()
-
-if current_locale is None:
-    current_locale = 'en'
-else:
-    current_locale = current_locale.split('_')[0]
-
 factory = asset.asset_init()
-i18n = asset.utils.get_i18n(current_locale, 'notice')
+i18n = asset.utils.get_i18n('notice')
 
 CANDLE_NAME = str(factory.properties['candlestick']['name'])
 
@@ -56,6 +46,7 @@ try:
             sys.exit(1)
         group = asset.CandleGroup(csv_file=filepath)
     else: group = asset.CandleGroup(csv_file=csv_file)
+    group.check_error()
     candlestick, number, merged = group.merged_tuple
     candlestick.save(CANDLE_FILEPATHS['candlestick'])
     number.save(CANDLE_FILEPATHS['number'])

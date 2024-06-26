@@ -1,0 +1,7 @@
+{
+    "NORMAL": "Normal",
+    "SCORE_NEGATIVE": "The score is negative",
+    "HIGH_LESS_THAN_MAX": "High score < opening or closing score",
+    "LOW_GREATER_THAN_MIN": "Low score > opening or closing score",
+    "UNKNOWN": "Unknown Error"
+}
