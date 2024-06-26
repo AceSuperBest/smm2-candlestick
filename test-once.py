@@ -49,6 +49,4 @@ group = asset.CandleGroup(candles=[
 ])
 
 
-merged = group.merged_image
-
-merged.show()
+group.merged_image.show()

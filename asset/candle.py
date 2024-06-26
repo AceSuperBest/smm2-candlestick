@@ -144,12 +144,12 @@ class CandleGraphicsResources:
         if length == 0:
             if should_up == 0:
                 return cls.black_solid
-            return (should_up > 0) ^ green_up and cls.green_solid or cls.red_solid
+            return (should_up > 0) ^ green_up and cls.red_solid or cls.green_solid
         length += length // abs(length) # 补偿缺的一分
-        return ((length > 0) ^ green_up and cls.green or cls.red).gen_image(
+        return ((length > 0) ^ green_up and cls.red or cls.green).gen_image(
             abs(length),
             scale=cls.scale,
-            direction=(Direction.down if length > 0 else Direction.up)
+            direction=(Direction.down if length < 0 else Direction.up)
         )
 
     @classmethod
@@ -157,7 +157,7 @@ class CandleGraphicsResources:
         """
         生成单个K线的图像，以及绘制参数
         """
-        should_up = down_length - up_length
+        should_up = up_length - down_length
         up_image = cls.gen_arrow(up_length, up=True)
         down_image = cls.gen_arrow(down_length, up=False)
         # 不再需要占用别的部分的长度，整数对齐天然给了一倍空间
@@ -220,7 +220,7 @@ class Candle(BaseModel):
 
     @property
     def should_up(self) -> int:
-        return self.body_length or self.down_length - self.up_length
+        return self.body_length or self.up_length - self.down_length
 
     @property
     def should_up_check(self) -> bool:
@@ -243,7 +243,7 @@ class Candle(BaseModel):
     def _draw_number(self, green: bool = False, with_box: tuple[int | None, int | None] | None = None) -> Image.Image | tuple[Image.Image, Image.Image, Image.Image, Image.Image]:
         if self.body_length == 0 and self.should_up == 0 and self.up_length == 0 and self.down_length == 0:
             return NumberGraphicsResources.create_number(self.close, 'black', with_margin=True, with_box=with_box)
-        color = (self.should_up > 0) ^ green and 'green' or (self.should_up == 0) and 'black' or 'red'
+        color = self.should_up_check ^ green and 'red' or (self.should_up == 0) and 'black' or 'green'
         return (
             NumberGraphicsResources.create_number(-self.open, color, with_margin=True, with_box=with_box),
             NumberGraphicsResources.create_number(self.high, color, with_margin=True, with_box=with_box),

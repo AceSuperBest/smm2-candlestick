@@ -23,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Build with PyInstaller
@@ -32,7 +32,7 @@ jobs:
 
       - name: Zip application and assets
         run: |
-          Compress-Archive -Path dist/*, assets -DestinationPath SMM2-Candlestick.zip
+          Compress-Archive -Path dist/*, assets -DestinationPath release.zip
 
       - name: Create Release
         id: create_release
@@ -45,17 +45,12 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Extract tag name
-        id: extract_tag
-        run: echo "TAG_NAME=${env:GITHUB_REF -replace 'refs/tags/', ''}" >> $env:GITHUB_ENV
-        shell: pwsh
-
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./SMM2-Candlestick.zip
-          asset_name: SMM2-Candlestick-${{ env.TAG_NAME }}.zip
+          asset_path: ./release.zip
+          asset_name: ${{ steps.create_release.outputs.release_name }}.zip
           asset_content_type: application/zip
