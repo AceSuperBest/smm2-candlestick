@@ -1,6 +1,6 @@
 # SMM2 - Candlestick Chart Generator
 
-[![Build and Release](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml/badge.svg)](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml)
+[![Build and Release](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml/badge.svg?event=push)](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml)
 
 ## Introduction
 Create a python script that generates candlestick charts from multiplayer scores in SMM2 (Super Mario Maker 2).
@@ -35,14 +35,16 @@ kline.csv:
 
 ```csv
 timestamp,open,high,low,close
-1718640000,7500,7622,7488,7583
-1718553600,7583,7603,7491,7536
-1718467200,7536,7572,7442,7445
-1718380800,7445,7452,7406,7426
-1718294400,7426,7456,7359,7394
-1718208000,7394,7440,7314,7335
-1718121600,7335,7461,7299,7412
-...
+1717862400,7500,7622,7488,7583
+1717948800,7583,7603,7491,7536
+1718035200,7536,7572,7442,7445
+1718121600,7445,7452,7406,7426
+1718208000,7426,7456,7359,7394
+1718294400,7394,7440,7314,7335
+1718380800,7335,7461,7299,7412
+1718467200,7412,7414,7412,7413
+1718553600,7413,7413,7410,7412
+1718640000,7412,7412,7412,7412
 ```
 
 ### Generate

@@ -1,6 +1,6 @@
 # SMM2 - Candlestick Chart Generator
 
-[![Build and Release](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml/badge.svg?branch=master&event=status)](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml)
+[![构建盾牌](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml/badge.svg?event=push)](https://github.com/AceSuperBest/smm2-candlestick/actions/workflows/build.yaml)
 
 English: [README_EN](README_EN.md) (Incomplete)
 
@@ -15,7 +15,7 @@ English: [README_EN](README_EN.md) (Incomplete)
 
 本项目并不算完善的，还需要做很多事情，而且机制很可能后面会改不少，所以，有需求在issue提吧
 
-**当前已经具备自动打包的Release、生成K线、生成K线数字、组合图、Windows提示，以及加了i18n的提示多语种支持（原生的错误全部为英文）**
+**当前已经具备自动打包的Release、生成K线、生成K线数字、组合图、纵坐标（分数轴）、横坐标（日期时间轴）、Windows提示，以及加了i18n的提示多语种支持（原生的错误全部为英文）**
 
 # 如何启动？
 ## 安装
@@ -50,14 +50,16 @@ kline.csv:
 
 ```csv
 timestamp,open,high,low,close
-1718640000,7500,7622,7488,7583
-1718553600,7583,7603,7491,7536
-1718467200,7536,7572,7442,7445
-1718380800,7445,7452,7406,7426
-1718294400,7426,7456,7359,7394
-1718208000,7394,7440,7314,7335
-1718121600,7335,7461,7299,7412
-...
+1717862400,7500,7622,7488,7583
+1717948800,7583,7603,7491,7536
+1718035200,7536,7572,7442,7445
+1718121600,7445,7452,7406,7426
+1718208000,7426,7456,7359,7394
+1718294400,7394,7440,7314,7335
+1718380800,7335,7461,7299,7412
+1718467200,7412,7414,7412,7413
+1718553600,7413,7413,7410,7412
+1718640000,7412,7412,7412,7412
 ```
 
 这个文件可以在 candlestick.json 配置中自定义 name 字段确定

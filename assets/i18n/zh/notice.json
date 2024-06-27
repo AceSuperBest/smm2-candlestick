@@ -2,7 +2,7 @@
     "file-selector-title": "选择K线数据文件",
     "file-selector-filter": "CSV文件",
     "please-precreate": "请先创建{csv}文件",
-    "success": "生成\n{candlestick}\n{number}\n{merged}\n成功",
-    "error": "生成\n{candlestick}\n{number}\n{merged}\n失败:\n{error}",
+    "success": "生成\n{candlestick}\n{number}\n{merged}\n{coord}\n{horizontal}\n成功",
+    "error": "生成\n{candlestick}\n{number}\n{merged}\n{coord}\n{horizontal}\n失败:\n{error}",
     "error-title": "错误"
 }

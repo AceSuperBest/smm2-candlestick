@@ -14,7 +14,9 @@ CANDLE_FILENAMES = {
     'csv': f'{CANDLE_NAME}.csv',
     'candlestick': f'{CANDLE_NAME}.png',
     'number': f'{CANDLE_NAME}-number.png',
-    'merged': f'{CANDLE_NAME}-merged.png'
+    'merged': f'{CANDLE_NAME}-merged.png',
+    'coord': f'{CANDLE_NAME}-coord.png',
+    'horizontal': f'{CANDLE_NAME}-horizontal.png',
 }
 
 CANDLE_FILEPATHS = {
@@ -47,10 +49,12 @@ try:
         group = asset.CandleGroup(csv_file=filepath)
     else: group = asset.CandleGroup(csv_file=csv_file)
     group.check_error()
-    candlestick, number, merged = group.merged_tuple
+    candlestick, number, merged, coord, horizontal = group.merged_tuple
     candlestick.save(CANDLE_FILEPATHS['candlestick'])
     number.save(CANDLE_FILEPATHS['number'])
     merged.save(CANDLE_FILEPATHS['merged'])
+    coord.save(CANDLE_FILEPATHS['coord'])
+    horizontal.save(CANDLE_FILEPATHS['horizontal'])
     message_box(i18n['success'].format(**CANDLE_FILENAMES))
 except Exception as e:
     import traceback
