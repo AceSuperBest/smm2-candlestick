@@ -53,9 +53,14 @@ class CandleGroup:
                         o, h, l, c = map(int, ohlc)
                         if not t.isdigit():
                             t = t.replace("T", " ").replace("Z", "").replace("/", "-").replace(".", "-")
-                            t = datetime.datetime.fromisoformat(t).timestamp()
+                            if ' ' in t:
+                                t = datetime.datetime.strptime(t, "%Y-%m-%d %H:%M:%S").timestamp()
+                            else:
+                                t = datetime.datetime.strptime(t, "%Y-%m-%d").timestamp()
                         t = int(t)
-                    except: continue
+                    except Exception as e:
+                        if len(row) != 5: continue
+                        raise ValueError(f"Invalid row: {row}") from e
                     self._candles.append(Candle(timestamp=t, open=o, high=h, low=l, close=c))
                 self._candles.sort(key=lambda x: x.timestamp)
         else:
